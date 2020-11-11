@@ -6,9 +6,11 @@ import {
   ManyToOne,
   CreateDateColumn,
   BaseEntity,
+  OneToMany,
 } from 'typeorm';
 
 import User from './User';
+import Product from './Product';
 
 @Entity()
 @ObjectType()
@@ -31,6 +33,12 @@ class Sale extends BaseEntity {
   })
   @Field(() => User)
   user: User;
+
+  @OneToMany(() => Product, (product) => product.sale, {
+    cascade: ['insert', 'update'],
+  })
+  @Field(() => [Product])
+  products: Product[];
 }
 
 export default Sale;
