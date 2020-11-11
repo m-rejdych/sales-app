@@ -1,9 +1,10 @@
-import { Resolver, Query, Arg } from 'type-graphql';
+import { Resolver, Query, Arg, Authorized } from 'type-graphql';
 
 import User from '../../../entity/User';
 
 @Resolver()
 class GetUser {
+  @Authorized()
   @Query(() => User)
   async getUser(@Arg('id') id: string): Promise<User> {
     const user = await User.findOne(id);

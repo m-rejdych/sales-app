@@ -23,7 +23,10 @@ class Register {
       lastName,
     });
     await user.save();
-    const token = sign({ userId: user.id }, TOKEN_SECRET as string);
+    const token = sign({ userId: user.id }, TOKEN_SECRET as string, {
+      expiresIn: '1h',
+      algorithm: 'HS256',
+    });
 
     return {
       user,
