@@ -3,13 +3,14 @@ import { Resolver, Mutation, Arg, Authorized, Ctx } from 'type-graphql';
 import Sale from '../../../entity/Sale';
 import User from '../../../entity/User';
 import Context from '../../../types/Context';
+import CreateSaleInput from './CreateSaleInput';
 
 @Resolver()
 class CreateSale {
   @Authorized()
   @Mutation(() => Sale)
   async createSale(
-    @Arg('subject') subject: string,
+    @Arg('data') { subject }: CreateSaleInput,
     @Ctx() ctx: Context,
   ): Promise<Sale> {
     const { userId } = ctx.user;

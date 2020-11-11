@@ -5,7 +5,7 @@ import {
   BaseEntity,
   OneToMany,
 } from 'typeorm';
-import { ObjectType, Field, Root } from 'type-graphql';
+import { ObjectType, Field, Root, ID } from 'type-graphql';
 
 import Sale from './Sale';
 
@@ -13,7 +13,7 @@ import Sale from './Sale';
 @ObjectType()
 class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  @Field()
+  @Field(() => ID)
   id: string;
 
   @Column()
