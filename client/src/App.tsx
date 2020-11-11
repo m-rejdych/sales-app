@@ -1,26 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Box, Typography } from '@material-ui/core';
+import { gql, useQuery } from '@apollo/client';
+
+const GET_USER = gql`
+  {
+    getUser(id: "02c6fcb8-18c7-4960-b125-91c8d846ae85") {
+      email
+      fullName
+    }
+  }
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const { loading, data, error } = useQuery(GET_USER);
+
+  console.log(loading, data, error);
+
+  const renderContent = () => {
+    if (error) return <Typography>Error occured</Typography>;
+    if (loading) return <Typography>Loading...</Typography>;
+    return <Typography>{data.getUser.email}</Typography>;
+  };
+
+  return <Box minHeight="100vh">{renderContent()}</Box>;
 }
 
 export default App;
