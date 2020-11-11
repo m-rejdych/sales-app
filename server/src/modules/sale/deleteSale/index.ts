@@ -5,6 +5,7 @@ import {
   Arg,
   Authorized,
   ForbiddenError,
+  ID,
 } from 'type-graphql';
 
 import Sale from '../../../entity/Sale';
@@ -16,7 +17,7 @@ class DeleteSale {
   @Authorized()
   @Mutation(() => String)
   async deleteSale(
-    @Arg('saleId') saleId: string,
+    @Arg('saleId', () => ID) saleId: string,
     @Ctx() ctx: Context,
   ): Promise<string> {
     const { userId } = ctx.user;

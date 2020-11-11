@@ -4,9 +4,11 @@ import Login from './user/login';
 import CreateSale from './sale/createSale';
 import UpdateSale from './sale/updateSale';
 import DeleteSale from './sale/deleteSale';
+import GetSale from './sale/getSale';
 import AddProduct from './product/addProduct';
 import UpdateProduct from './product/updateProduct';
 import DeleteProduct from './product/deleteProduct';
+import GetProduct from './product/getProduct';
 
 const resolvers = [
   Register,
@@ -15,9 +17,11 @@ const resolvers = [
   CreateSale,
   UpdateSale,
   DeleteSale,
+  GetSale,
   AddProduct,
   UpdateProduct,
   DeleteProduct,
+  GetProduct,
 ] as const;
 
 export default resolvers;
