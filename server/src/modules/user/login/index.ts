@@ -17,7 +17,10 @@ class Login {
     if (!user) throw new Error('Wrong email or password!');
     const isValid = await compare(password, user.password);
     if (!isValid) throw new Error('Wrong email or password!');
-    const token = sign({ userId: user.id }, TOKEN_SECRET as string);
+    const token = sign({ userId: user.id }, TOKEN_SECRET as string, {
+      expiresIn: '1h',
+      algorithm: 'HS256',
+    });
     return {
       user,
       token,

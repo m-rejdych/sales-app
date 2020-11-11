@@ -1,5 +1,13 @@
-import { PrimaryGeneratedColumn, Column, Entity, BaseEntity } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  BaseEntity,
+  OneToMany,
+} from 'typeorm';
 import { ObjectType, Field, Root } from 'type-graphql';
+
+import Sale from './Sale';
 
 @Entity()
 @ObjectType()
@@ -19,6 +27,12 @@ class User extends BaseEntity {
   @Column()
   @Field()
   lastName: string;
+
+  @OneToMany(() => Sale, (sale) => sale.user, {
+    cascade: ['insert', 'update'],
+  })
+  @Field(() => [Sale])
+  sales: Sale[];
 
   @Column()
   password: string;

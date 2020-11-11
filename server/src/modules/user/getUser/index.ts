@@ -7,7 +7,7 @@ class GetUser {
   @Authorized()
   @Query(() => User)
   async getUser(@Arg('id') id: string): Promise<User> {
-    const user = await User.findOne(id);
+    const user = await User.findOne(id, { relations: ['sales'] });
     if (!user) throw new Error('User not found!');
     return user;
   }
