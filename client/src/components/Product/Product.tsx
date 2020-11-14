@@ -11,6 +11,7 @@ import {
 const useStyles = makeStyles((theme) => ({
   card: {
     border: `1px solid ${theme.palette.secondary.main}`,
+    margin: theme.spacing(2),
   },
 }));
 

@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import {
   Card,
-  CardContent,
   CardHeader,
   CardActions,
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   makeStyles,
   Button,
   Typography,
   IconButton,
   CircularProgress,
   Box,
-  TextField,
-  Popover,
 } from '@material-ui/core';
 import { Close } from '@material-ui/icons';
 
 import Product from '../Product';
+import AddProductForm from '../AddProductForm';
+import EditSalePopover from '../EditSalePopover';
 import {
   useGetUserQuery,
   useUpdateSaleMutation,
@@ -30,12 +30,16 @@ const useStyles = makeStyles((theme) => ({
   card: {
     border: `1px solid ${theme.palette.primary.main}`,
     maxWidth: '30vw',
-    margin: theme.spacing(3),
+    margin: theme.spacing(2),
+    cursor: 'pointer',
   },
   dialogTitle: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  dialogMinWidth: {
+    minWidth: 500,
   },
   errorColor: {
     backgroundColor: theme.palette.error.main,
@@ -70,8 +74,8 @@ const Sale: React.FC<Props> = ({
   user: { fullName, id: userId },
   products,
 }) => {
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { data, loading } = useGetUserQuery();
@@ -92,6 +96,9 @@ const Sale: React.FC<Props> = ({
   const classes = useStyles();
 
   const toggleDialog = (): void => {
+    setTimeout(() => {
+      setIsAddingProduct(false);
+    }, 500);
     setOpen((o) => !o);
   };
 
@@ -103,102 +110,90 @@ const Sale: React.FC<Props> = ({
   };
 
   const handleClosePopover = (): void => {
-    setValue('');
     setAnchorEl(null);
     setPopoverOpen(false);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-  ): void => {
-    setValue(e.target.value);
-  };
-
-  const handleUpdateSale = async (): Promise<void> => {
+  const handleUpdateSale = async (value: string): Promise<void> => {
     await updateSale({ variables: { data: { saleId: id, subject: value } } });
-    setValue('');
   };
 
   const handleDeleteSale = async (): Promise<void> => {
-    const result = await deleteSale({ variables: { saleId: id } });
+    await deleteSale({ variables: { saleId: id } });
   };
 
   return (
-    <Card elevation={3} className={classes.card}>
-      <CardHeader title={`${subject} sale`} subheader={fullName} />
-      <CardContent>
-        <Dialog open={open} onClose={toggleDialog} maxWidth="lg">
-          <DialogTitle disableTypography className={classes.dialogTitle}>
-            <Typography variant="h4">{`${subject} sale`}</Typography>
-            <IconButton onClick={toggleDialog}>
-              <Close />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            {products.map((product) => (
-              <Product key={product.id} {...product} />
-            ))}
-          </DialogContent>
-        </Dialog>
-      </CardContent>
-      <CardActions>
-        {loading ? (
-          <Box display="flex" justifyContent="center">
-            <CircularProgress size={24} color="primary" />
-          </Box>
-        ) : data?.getUser.id === userId ? (
-          <>
+    <>
+      <Card elevation={3} className={classes.card} onClick={toggleDialog}>
+        <CardHeader title={`${subject} sale`} subheader={fullName} />
+        <CardActions onClick={(e) => e.stopPropagation()}>
+          {loading ? (
+            <Box display="flex" justifyContent="center">
+              <CircularProgress size={24} color="primary" />
+            </Box>
+          ) : (
+            data?.getUser.id === userId && (
+              <>
+                <Button
+                  onClick={handleOpenPopover}
+                  variant="contained"
+                  color="primary"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="contained"
+                  className={classes.errorColor}
+                  onClick={handleDeleteSale}
+                >
+                  Delete
+                </Button>
+                <EditSalePopover
+                  handleClose={handleClosePopover}
+                  open={popoverOpen}
+                  anchorEl={anchorEl}
+                  handleUpdateSale={handleUpdateSale}
+                />
+              </>
+            )
+          )}
+        </CardActions>
+      </Card>
+      <Dialog
+        open={open}
+        onClose={toggleDialog}
+        maxWidth="lg"
+        classes={{ paperScrollPaper: classes.dialogMinWidth }}
+      >
+        <DialogTitle disableTypography className={classes.dialogTitle}>
+          <Typography variant="h4">{`${subject} sale`}</Typography>
+          <IconButton onClick={toggleDialog}>
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {isAddingProduct ? (
+            <AddProductForm
+              saleId={id}
+              cancelAdding={(): void => setIsAddingProduct(false)}
+            />
+          ) : (
+            products.map((product) => <Product key={product.id} {...product} />)
+          )}
+        </DialogContent>
+        {data?.getUser.id === userId && !isAddingProduct && (
+          <DialogActions>
             <Button
-              onClick={handleOpenPopover}
+              onClick={(): void => setIsAddingProduct(true)}
               variant="contained"
               color="primary"
             >
-              Edit
+              Add product
             </Button>
-            <Button
-              variant="contained"
-              className={classes.errorColor}
-              onClick={handleDeleteSale}
-            >
-              Delete
-            </Button>
-            <Popover
-              anchorEl={anchorEl}
-              open={popoverOpen}
-              onClose={handleClosePopover}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              classes={{ paper: classes.overflowXVisible }}
-            >
-              <TextField
-                label="Subject"
-                variant="outlined"
-                color="primary"
-                value={value}
-                onChange={handleChange}
-                InputProps={{
-                  endAdornment: (
-                    <Button onClick={handleUpdateSale} color="primary">
-                      Update
-                    </Button>
-                  ),
-                }}
-              />
-            </Popover>
-          </>
-        ) : (
-          <Button variant="contained" color="primary" onClick={toggleDialog}>
-            View
-          </Button>
+          </DialogActions>
         )}
-      </CardActions>
-    </Card>
+      </Dialog>
+    </>
   );
 };
 

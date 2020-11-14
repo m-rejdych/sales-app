@@ -6,19 +6,24 @@ import {
   makeStyles,
   Button,
 } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 import { Fab, Popover } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
-import { gql } from '@apollo/client';
+import { gql, useApolloClient } from '@apollo/client';
 
 import Sale from '../../components/Sale';
 import {
   useGetAllSalesQuery,
   useCreateSaleMutation,
+  useGetUserQuery,
 } from '../../generated/graphql';
 
 const useStyles = makeStyles((theme) => ({
   overflowXVisible: {
     overflowX: 'visible',
+  },
+  marginRight: {
+    marginRight: theme.spacing(2),
   },
 }));
 
@@ -27,6 +32,7 @@ const Home: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const { data, loading } = useGetAllSalesQuery();
+  const { refetch } = useGetUserQuery();
   const [createSale] = useCreateSaleMutation({
     update(cache, { data: { createSale } }: any) {
       cache.modify({
@@ -51,6 +57,8 @@ const Home: React.FC = () => {
       });
     },
   });
+  const client = useApolloClient();
+  const history = useHistory();
   const classes = useStyles();
 
   const handleOpenPopover = (
@@ -77,6 +85,12 @@ const Home: React.FC = () => {
     setValue('');
   };
 
+  const handleLogout = async (): Promise<void> => {
+    localStorage.clear();
+    await client.clearStore();
+    history.push('/login');
+  };
+
   return (
     <Box height="100vh" padding={4}>
       {loading ? (
@@ -96,7 +110,14 @@ const Home: React.FC = () => {
           position="relative"
           flexWrap="wrap"
         >
-          <Box clone position="absolute" right={0} top={0}>
+          <Box position="absolute" right={0} top={0}>
+            <Button
+              onClick={handleLogout}
+              className={classes.marginRight}
+              color="secondary"
+            >
+              Logout
+            </Button>
             <Fab onClick={handleOpenPopover} color="secondary">
               <Add fontSize="large" />
             </Fab>
