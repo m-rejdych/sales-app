@@ -62,6 +62,7 @@ const Home: React.FC = () => {
 
   const handleClosePopover = (): void => {
     setValue('');
+    setAnchorEl(null);
     setOpen(false);
   };
 
@@ -89,10 +90,11 @@ const Home: React.FC = () => {
         </Box>
       ) : (
         <Box
-          height="100%"
+          minHeight="100%"
           display="flex"
           alignItems="flex-start"
           position="relative"
+          flexWrap="wrap"
         >
           <Box clone position="absolute" right={0} top={0}>
             <Fab onClick={handleOpenPopover} color="secondary">

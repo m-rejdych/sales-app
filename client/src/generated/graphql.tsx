@@ -77,7 +77,7 @@ export type Mutation = {
   login: RegisterResponse;
   createSale: Sale;
   updateSale: Sale;
-  deleteSale: Scalars['String'];
+  deleteSale: Scalars['ID'];
   addProduct: Product;
   updateProduct: Product;
   deleteProduct: Scalars['String'];
@@ -178,6 +178,29 @@ export type CreateSaleMutation = (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'fullName'>
     ) }
+  ) }
+);
+
+export type DeleteSaleMutationVariables = Exact<{
+  saleId: Scalars['ID'];
+}>;
+
+
+export type DeleteSaleMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteSale'>
+);
+
+export type UpdateSaleMutationVariables = Exact<{
+  data: UpdateSaleInput;
+}>;
+
+
+export type UpdateSaleMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSale: (
+    { __typename?: 'Sale' }
+    & Pick<Sale, 'subject' | 'id'>
   ) }
 );
 
@@ -287,6 +310,69 @@ export function useCreateSaleMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateSaleMutationHookResult = ReturnType<typeof useCreateSaleMutation>;
 export type CreateSaleMutationResult = Apollo.MutationResult<CreateSaleMutation>;
 export type CreateSaleMutationOptions = Apollo.BaseMutationOptions<CreateSaleMutation, CreateSaleMutationVariables>;
+export const DeleteSaleDocument = gql`
+    mutation DeleteSale($saleId: ID!) {
+  deleteSale(saleId: $saleId)
+}
+    `;
+export type DeleteSaleMutationFn = Apollo.MutationFunction<DeleteSaleMutation, DeleteSaleMutationVariables>;
+
+/**
+ * __useDeleteSaleMutation__
+ *
+ * To run a mutation, you first call `useDeleteSaleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSaleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSaleMutation, { data, loading, error }] = useDeleteSaleMutation({
+ *   variables: {
+ *      saleId: // value for 'saleId'
+ *   },
+ * });
+ */
+export function useDeleteSaleMutation(baseOptions?: Apollo.MutationHookOptions<DeleteSaleMutation, DeleteSaleMutationVariables>) {
+        return Apollo.useMutation<DeleteSaleMutation, DeleteSaleMutationVariables>(DeleteSaleDocument, baseOptions);
+      }
+export type DeleteSaleMutationHookResult = ReturnType<typeof useDeleteSaleMutation>;
+export type DeleteSaleMutationResult = Apollo.MutationResult<DeleteSaleMutation>;
+export type DeleteSaleMutationOptions = Apollo.BaseMutationOptions<DeleteSaleMutation, DeleteSaleMutationVariables>;
+export const UpdateSaleDocument = gql`
+    mutation UpdateSale($data: UpdateSaleInput!) {
+  updateSale(data: $data) {
+    subject
+    id
+  }
+}
+    `;
+export type UpdateSaleMutationFn = Apollo.MutationFunction<UpdateSaleMutation, UpdateSaleMutationVariables>;
+
+/**
+ * __useUpdateSaleMutation__
+ *
+ * To run a mutation, you first call `useUpdateSaleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSaleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSaleMutation, { data, loading, error }] = useUpdateSaleMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateSaleMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSaleMutation, UpdateSaleMutationVariables>) {
+        return Apollo.useMutation<UpdateSaleMutation, UpdateSaleMutationVariables>(UpdateSaleDocument, baseOptions);
+      }
+export type UpdateSaleMutationHookResult = ReturnType<typeof useUpdateSaleMutation>;
+export type UpdateSaleMutationResult = Apollo.MutationResult<UpdateSaleMutation>;
+export type UpdateSaleMutationOptions = Apollo.BaseMutationOptions<UpdateSaleMutation, UpdateSaleMutationVariables>;
 export const GetAllSalesDocument = gql`
     query GetAllSales($take: Int, $skip: Int) {
   getAllSales(take: $take, skip: $skip) {

@@ -15,7 +15,7 @@ import Context from '../../../types/Context';
 @Resolver()
 class DeleteSale {
   @Authorized()
-  @Mutation(() => String)
+  @Mutation(() => ID)
   async deleteSale(
     @Arg('saleId', () => ID) saleId: string,
     @Ctx() ctx: Context,
@@ -29,7 +29,7 @@ class DeleteSale {
     if (!sale) throw new Error('Sale not found!');
     if ((sale.user as unknown) !== userId) throw new ForbiddenError();
     await sale.remove();
-    return 'Sale successfully deleted!';
+    return saleId;
   }
 }
 

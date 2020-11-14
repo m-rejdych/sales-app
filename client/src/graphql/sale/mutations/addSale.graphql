@@ -1,0 +1,10 @@
+mutation CreateSale($data: CreateSaleInput!) {
+  createSale(data: $data) {
+    id
+    subject
+    user {
+      id
+      fullName
+    }
+  }
+}

@@ -1,0 +1,6 @@
+mutation UpdateSale($data: UpdateSaleInput!) {
+  updateSale(data: $data) {
+    subject
+    id
+  }
+}
