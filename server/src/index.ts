@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import express from 'express';
 import jwt from 'express-jwt';
+import cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
@@ -16,6 +17,7 @@ const main = async (): Promise<void> => {
   const schema = await buildSchema({ resolvers, authChecker });
 
   const app = express();
+  app.use(cors());
   app.use(
     API_URI as string,
     jwt({
@@ -29,7 +31,7 @@ const main = async (): Promise<void> => {
     schema,
     context: ({ req }) => ({ req, user: (req as ExtendedRequest).user }),
   });
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, cors: false });
 
   app.listen({ port: PORT, path: API_URI }, () =>
     console.log(`🚀 Server started at http://localhost:${PORT}${API_URI}`),

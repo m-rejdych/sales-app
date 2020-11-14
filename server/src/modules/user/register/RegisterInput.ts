@@ -4,19 +4,22 @@ import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
 @InputType()
 class RegisterInput {
   @Field()
-  @IsEmail()
+  @IsEmail(undefined, { message: 'Please, enter a valid email!' })
   email: string;
 
   @Field()
-  @Matches(/^(?=.*\d).{4,8}$/)
+  @Matches(/^(?=.*\d).{4,8}$/, {
+    message:
+      'Password must be at least 4 characters long and contain at least one digit!',
+  })
   password: string;
 
   @Field()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'First name can not be empty!' })
   firstName: string;
 
   @Field()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Last name can not be empty!' })
   lastName: string;
 }
 

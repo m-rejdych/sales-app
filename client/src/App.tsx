@@ -1,28 +1,54 @@
-import React from 'react';
-import { Box, Typography } from '@material-ui/core';
-import { gql, useQuery } from '@apollo/client';
+import React, { useEffect } from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { Box, CircularProgress } from '@material-ui/core';
 
-const GET_USER = gql`
-  {
-    getUser(id: "02c6fcb8-18c7-4960-b125-91c8d846ae85") {
-      email
-      fullName
+import Auth from './pages/Auth';
+import Home from './pages/Home';
+import { useGetUserQuery } from './generated/graphql';
+
+const App: React.FC = () => {
+  const { loading, data } = useGetUserQuery();
+
+  useEffect(() => {
+    const expiresIn = localStorage.getItem('expiresIn');
+    if (Number(expiresIn) - Date.now() < 0) {
+      localStorage.clear();
     }
-  }
-`;
+  }, []);
 
-function App() {
-  const { loading, data, error } = useQuery(GET_USER);
+  const renderRoutes = (): JSX.Element => {
+    if (loading) {
+      return (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="100vh"
+        >
+          <CircularProgress size={300} color="primary" />
+        </Box>
+      );
+    }
 
-  console.log(loading, data, error);
+    if (data?.getUser.id) {
+      return (
+        <Switch>
+          <Route path="/home" component={Home} />
+          <Redirect to="/home" />
+        </Switch>
+      );
+    }
 
-  const renderContent = () => {
-    if (error) return <Typography>Error occured</Typography>;
-    if (loading) return <Typography>Loading...</Typography>;
-    return <Typography>{data.getUser.email}</Typography>;
+    return (
+      <Switch>
+        <Route path="/register" component={Auth} />
+        <Route path="/login" component={Auth} />
+        <Redirect to="/register" />
+      </Switch>
+    );
   };
 
-  return <Box minHeight="100vh">{renderContent()}</Box>;
-}
+  return <Box minHeight="100vh">{renderRoutes()}</Box>;
+};
 
 export default App;
