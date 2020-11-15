@@ -171,7 +171,7 @@ const AuthForm: React.FC<Props> = ({ isLoggingIn }) => {
         onSubmit={() => {}}
         enableReinitialize
       >
-        {({ handleReset, values }) => (
+        {({ handleReset, values, isValid, dirty }) => (
           <>
             <CardHeader title={isLoggingIn ? 'Login' : 'Register'} />
             <CardContent className={classes.cardContent}>
@@ -183,6 +183,7 @@ const AuthForm: React.FC<Props> = ({ isLoggingIn }) => {
             </CardContent>
             <CardActions>
               <Button
+                disabled={!(isValid && dirty)}
                 color="primary"
                 variant="contained"
                 onClick={() => handleSubmit(values)}

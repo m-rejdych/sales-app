@@ -4,6 +4,7 @@ import { Box, CircularProgress } from '@material-ui/core';
 
 import Auth from './pages/Auth';
 import Home from './pages/Home';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useGetUserQuery } from './generated/graphql';
 
 const App: React.FC = () => {
@@ -48,7 +49,11 @@ const App: React.FC = () => {
     );
   };
 
-  return <Box minHeight="100vh">{renderRoutes()}</Box>;
+  return (
+    <ErrorBoundary>
+      <Box minHeight="100vh">{renderRoutes()}</Box>
+    </ErrorBoundary>
+  );
 };
 
 export default App;

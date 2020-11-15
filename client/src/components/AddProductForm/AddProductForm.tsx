@@ -133,7 +133,7 @@ const AddProductForm: React.FC<Props> = ({
 
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}}>
-      {({ handleReset, values }) => (
+      {({ handleReset, values, isValid, dirty }) => (
         <Box display="flex" flexDirection="column">
           {fields.map((field) => (
             <InputElement key={field.name} {...field} />
@@ -141,6 +141,7 @@ const AddProductForm: React.FC<Props> = ({
           <Box className={classes.alignSelfEnd}>
             <Button onClick={() => handleCancel(handleReset)}>Cancel</Button>
             <Button
+              disabled={!(isValid && dirty)}
               onClick={() =>
                 isEditing
                   ? handleUpdateProduct(values)
