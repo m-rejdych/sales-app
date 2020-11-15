@@ -24,6 +24,6 @@ This is a simple full stack CRUD project made for node/graphql/apollo/postgreSQL
 * typeorm
 * apollo-server
 * jsonwebtoken
-* bcyptjs
+* bcryptjs
 * postgreSQL
 * typescript
