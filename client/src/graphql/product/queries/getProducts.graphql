@@ -1,0 +1,11 @@
+query GetProducts($saleId: ID!) {
+  getProducts(saleId: $saleId) {
+    id
+    name
+    description
+    price
+    sale {
+      id
+    }
+  }
+}

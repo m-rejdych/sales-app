@@ -23,6 +23,7 @@ import {
   useGetUserQuery,
   useUpdateSaleMutation,
   useDeleteSaleMutation,
+  useGetProductsQuery,
   Sale as SaleType,
 } from '../../generated/graphql';
 
@@ -54,8 +55,7 @@ interface User {
   fullName: string;
 }
 
-interface ProductType {
-  id: string;
+interface InitialValues {
   name: string;
   description: string;
   price: number;
@@ -65,20 +65,27 @@ interface Props {
   id: string;
   subject: string;
   user: User;
-  products: ProductType[];
 }
 
 const Sale: React.FC<Props> = ({
   id,
   subject,
   user: { fullName, id: userId },
-  products,
 }) => {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [open, setOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProductId, setEditedProductId] = useState<string | null>(null);
+  const [
+    productInitialValues,
+    setProductInitialValues,
+  ] = useState<InitialValues | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { data, loading } = useGetUserQuery();
+  const { data: productsData } = useGetProductsQuery({
+    variables: { saleId: id },
+  });
   const [updateSale] = useUpdateSaleMutation();
   const [deleteSale] = useDeleteSaleMutation({
     update(cache, { data: { deleteSale } }: any) {
@@ -120,6 +127,13 @@ const Sale: React.FC<Props> = ({
 
   const handleDeleteSale = async (): Promise<void> => {
     await deleteSale({ variables: { saleId: id } });
+  };
+
+  const handleCancel = (): void => {
+    setIsAddingProduct(false);
+    setIsEditing(false);
+    setEditedProductId(null);
+    setProductInitialValues(null);
   };
 
   return (
@@ -172,16 +186,28 @@ const Sale: React.FC<Props> = ({
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          {isAddingProduct ? (
+          {isAddingProduct || isEditing ? (
             <AddProductForm
               saleId={id}
-              cancelAdding={(): void => setIsAddingProduct(false)}
+              cancelAdding={handleCancel}
+              isEditing={isEditing}
+              productInitialValues={productInitialValues}
+              editedProductId={editedProductId}
             />
           ) : (
-            products.map((product) => <Product key={product.id} {...product} />)
+            productsData?.getProducts.map((product) => (
+              <Product
+                key={product.id}
+                isOwner={data?.getUser.id === userId}
+                setIsEditing={setIsEditing}
+                setProductInitialValues={setProductInitialValues}
+                setEditedProductId={setEditedProductId}
+                {...product}
+              />
+            ))
           )}
         </DialogContent>
-        {data?.getUser.id === userId && !isAddingProduct && (
+        {data?.getUser.id === userId && !isAddingProduct && !isEditing && (
           <DialogActions>
             <Button
               onClick={(): void => setIsAddingProduct(true)}

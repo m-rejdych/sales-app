@@ -10,6 +10,7 @@ import AddProduct from './product/addProduct';
 import UpdateProduct from './product/updateProduct';
 import DeleteProduct from './product/deleteProduct';
 import GetProduct from './product/getProduct';
+import GetProducts from './product/getProducts';
 
 const resolvers = [
   Register,
@@ -24,6 +25,7 @@ const resolvers = [
   UpdateProduct,
   DeleteProduct,
   GetProduct,
+  GetProducts,
 ] as const;
 
 export default resolvers;

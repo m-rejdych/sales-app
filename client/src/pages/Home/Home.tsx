@@ -15,7 +15,6 @@ import Sale from '../../components/Sale';
 import {
   useGetAllSalesQuery,
   useCreateSaleMutation,
-  useGetUserQuery,
 } from '../../generated/graphql';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,7 +31,6 @@ const Home: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const { data, loading } = useGetAllSalesQuery();
-  const { refetch } = useGetUserQuery();
   const [createSale] = useCreateSaleMutation({
     update(cache, { data: { createSale } }: any) {
       cache.modify({
@@ -83,6 +81,7 @@ const Home: React.FC = () => {
   const handleAddSale = async (): Promise<void> => {
     await createSale({ variables: { data: { subject: value } } });
     setValue('');
+    setOpen(false);
   };
 
   const handleLogout = async (): Promise<void> => {

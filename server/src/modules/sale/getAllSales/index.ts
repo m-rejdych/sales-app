@@ -19,7 +19,7 @@ class GetAllSales {
     const sales = await Sale.find({
       take,
       skip,
-      relations: ['user', 'products'],
+      relations: ['user'],
     });
     return sales;
   }

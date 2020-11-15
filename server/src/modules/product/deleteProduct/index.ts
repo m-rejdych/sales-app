@@ -8,7 +8,7 @@ import Context from '../../../types/Context';
 @Resolver()
 class DeleteProduct {
   @Authorized()
-  @Mutation(() => String)
+  @Mutation(() => ID)
   async deleteProduct(
     @Arg('productId', () => ID) productId: string,
     @Ctx() ctx: Context,
@@ -23,7 +23,7 @@ class DeleteProduct {
     const sale = await Sale.findOne(product.sale);
     if (!sale) throw new Error('Sale not found!');
     await product.remove();
-    return 'Product successfully deleted!';
+    return productId;
   }
 }
 

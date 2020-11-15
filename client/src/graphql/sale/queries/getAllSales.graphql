@@ -6,11 +6,5 @@ query GetAllSales($take: Int, $skip: Int) {
       id
       fullName
     }
-    products {
-      id
-      name
-      description
-      price
-    }
   }
 }

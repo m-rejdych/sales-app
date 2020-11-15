@@ -1,8 +1,13 @@
 import React from 'react';
 import { Button, Box, makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
+import { gql } from '@apollo/client';
 
 import InputElement from '../InputElement';
+import {
+  useAddProductMutation,
+  useUpdateProductMutation,
+} from '../../generated/graphql';
 
 const useStyles = makeStyles((theme) => ({
   alignSelfEnd: {
@@ -10,20 +15,83 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+interface Values {
+  name: string;
+  description: string;
+  price: number;
+}
+
 interface Props {
   saleId: string;
   cancelAdding: () => void;
+  isEditing?: boolean;
+  editedProductId?: string | null;
+  productInitialValues?: Values | null;
 }
 
-const AddProductForm: React.FC<Props> = ({ saleId, cancelAdding }) => {
+const AddProductForm: React.FC<Props> = ({
+  saleId,
+  cancelAdding,
+  isEditing,
+  productInitialValues,
+  editedProductId,
+}) => {
   const classes = useStyles();
+  const [updateProduct] = useUpdateProductMutation();
+  const [addProduct] = useAddProductMutation({
+    update(cache, { data: { addProduct } }: any) {
+      cache.modify({
+        fields: {
+          getProducts() {
+            const newProducts = cache.writeQuery({
+              data: addProduct,
+              variables: { saleId },
+              query: gql`
+                query GetProducts($saleId: ID) {
+                  getProducts(saleId: $saleId) {
+                    id
+                    name
+                    description
+                    price
+                  }
+                }
+              `,
+            });
+            return newProducts;
+          },
+        },
+      });
+    },
+  });
 
   const handleCancel = (handleReset: () => void): void => {
     handleReset();
     cancelAdding();
   };
 
-  const initialValues = {
+  const handleAddProduct = async (values: Values): Promise<void> => {
+    const { price, ...rest } = values;
+    await addProduct({
+      variables: { data: { ...rest, saleId, price: Number(price) } },
+    });
+    cancelAdding();
+  };
+
+  const handleUpdateProduct = async (values: Values): Promise<void> => {
+    const { price, ...rest } = values;
+    await updateProduct({
+      variables: {
+        data: {
+          ...rest,
+          price: Number(price),
+          productId: editedProductId as string,
+        },
+      },
+    });
+    cancelAdding();
+  };
+
+  const initialValues = productInitialValues || {
     name: '',
     description: '',
     price: 0,
@@ -65,15 +133,23 @@ const AddProductForm: React.FC<Props> = ({ saleId, cancelAdding }) => {
 
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}}>
-      {({ handleReset }) => (
+      {({ handleReset, values }) => (
         <Box display="flex" flexDirection="column">
           {fields.map((field) => (
             <InputElement key={field.name} {...field} />
           ))}
           <Box className={classes.alignSelfEnd}>
             <Button onClick={() => handleCancel(handleReset)}>Cancel</Button>
-            <Button variant="contained" color="primary">
-              Add
+            <Button
+              onClick={() =>
+                isEditing
+                  ? handleUpdateProduct(values)
+                  : handleAddProduct(values)
+              }
+              variant="contained"
+              color="primary"
+            >
+              {isEditing ? 'Edit' : 'Add'}
             </Button>
           </Box>
         </Box>
